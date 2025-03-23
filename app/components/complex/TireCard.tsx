@@ -91,10 +91,10 @@ export default function TireCard({ brand, model_id, model, url, type, size, img,
           Ver detalles <ExternalLink className="ml-1 h-3 w-3" />
         </Link>
         <Dialog>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button>Tamaños y precios</Button>
             </DialogTrigger>
-            {dialogContent(img, model, tires)}
+            {dialogContent(img, model, tires, url)}
         </Dialog>
         </CardFooter>
       </Card>
@@ -105,9 +105,9 @@ export default function TireCard({ brand, model_id, model, url, type, size, img,
     return `DOP ${price.toLocaleString("en-US", { minimumFractionDigits: 1 })}`;
   }
 
-  const dialogContent = (img: string, model: string, tires: Tire[]) => {
+  const dialogContent = (img: string, model: string, tires: Tire[], url: string) => {
     return (
-        <DialogContent className="max-w-6xl max-h-[90vh] flex flex-col">
+        <DialogContent className="!max-w-4xl max-h-[90vh] flex flex-col">
             <DialogTitle className="text-xl font-bold">{model}</DialogTitle>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
@@ -155,6 +155,12 @@ export default function TireCard({ brand, model_id, model, url, type, size, img,
                         </TableBody>
                     </Table>
                 </div>
+            </div>
+
+            <div className="mt-4 text-sm text-muted-foreground">
+              <Link href={url} target="_blank" className="inline-flex items-center text-primary hover:underline">
+                Ver detalles del fabricante <ExternalLink className="ml-1 h-3 w-3" />
+              </Link>
             </div>
 
         </DialogContent>
