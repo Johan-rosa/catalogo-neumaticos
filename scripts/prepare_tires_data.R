@@ -45,11 +45,14 @@ all_tires <- all_tires |>
   )
 
 
-all_tires |>
+sample_data <- all_tires |>
   group_by(model) |>
-  slice_head(n = 3) |> View()
+  slice_head(n = 3)
 
 
 saveRDS(all_tires, "data/all_tires.rds")
+saveRDS(sample_data, "data/tire_sample.rds")
+
 write(jsonlite::toJSON(all_tires), "data/all_tires.json")
+write(jsonlite::toJSON(sample_data), "data/tire_sample.json")
 
