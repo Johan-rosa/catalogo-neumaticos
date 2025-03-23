@@ -49,7 +49,7 @@ export default function TireCard({ brand, model_id, model, url, type, size, img,
         <Card className="overflow-hidden">
             <div className="relative h-48 bg-muted">
                 <Image src={img || "/placeholder.svg"} alt={model} fill className="object-contain p-4" />
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <Dialog >
                     <DialogTrigger asChild>
                         <Button
                             size="icon"
