@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import logoFormula from '../public/formula.png';
-import { Button } from '../components/ui/button';
+import { Pagination } from "../components/ui/pagination";
 import { Input } from "@/components/ui/input"
 import { Search, Maximize2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -29,14 +29,31 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [tireData, setTireData] = useState<Tire[]>([]);
   const [filteredTireData, setFilteredTireData] = useState<Tire[]>([]);
-  const [uniqueTiresTypes, setUniqueTiresTypes] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(12)
+  const [activeTab, setActiveTab] = useState("all")
+
+    // Handle page change
+    const handlePageChange = (page: number) => {
+      setCurrentPage(page)
+      // Scroll to top when changing pages
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }
+  
+    // Reset page when search query changes or tab changes
+    useEffect(() => {
+      setCurrentPage(1)
+    }, [searchQuery, activeTab])
+  
 
   useEffect(() => {
     import('../public/tire_sample').then((module) => {
       const data = module.default.filter((tire: any) => tire.size !== undefined) as Tire[];
       setTireData(data);
       setFilteredTireData(data);
-      setUniqueTiresTypes([...new Set(data.map((tire: Tire) => tire.type))]);
     });
   }, []);
 
@@ -94,7 +111,7 @@ export default function Home() {
           />
         </div>
 
-        <Tabs defaultValue="all" className=" w-full">
+        <Tabs defaultValue="all" className=" w-full" onValueChange={(value) => setActiveTab(value)}>
           <TabsList className="grid-cols-4 mb-8">
             <TabsTrigger value="all">Todas</TabsTrigger>
             {tireTypes.map((type) => (
@@ -105,18 +122,47 @@ export default function Home() {
           </TabsList>
           <TabsContent value="all">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {uniqueModels.map((tire) => (
-                <TireCard key={tire.model_id} {...tire} tireData={filteredTireData} />
-              ))}
+              {
+                uniqueModels
+                  .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                  .map((tire) => (
+                  <TireCard key={tire.model_id} {...tire} tireData={filteredTireData} />
+                  ))
+              }
+            </div>
+            {/* Pagination Controls */}
+            <div className="flex justify-center mt-8">
+              <Pagination
+                totalItems={uniqueModels.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+              />
             </div>
           </TabsContent>
           {tireTypes.map((type) => (
             <TabsContent key={type} value={type} className="mt-0">
               <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-                 {uniqueModels.filter((tire) => tire.type === type).map((tire) => (
-                  <TireCard key={tire.model_id} {...tire} tireData={filteredTireData} />
-                ))}
+                 {
+                  uniqueModels
+                    .filter((tire) => tire.type === type)
+                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                    .map((tire) => (
+                      <TireCard key={tire.model_id} {...tire} tireData={filteredTireData} />
+                    ))  
+                }
               </div>
+
+            {/* Pagination Controls */}
+            <div className="flex justify-center mt-8">
+              <Pagination
+                totalItems={uniqueModels.filter((tire) => tire.type === type).length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+              />
+            </div>
+
             </TabsContent>
           ))}
 
