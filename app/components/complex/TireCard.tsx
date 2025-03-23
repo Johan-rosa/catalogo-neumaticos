@@ -154,6 +154,21 @@ export default function TireCard({ brand, model_id, model, url, type, size, img,
                             ))}
                         </TableBody>
                     </Table>
+
+                    {/* Order Summary and Add to Order Button */}
+                    <div className="mt-6 space-y-4">
+                    <Separator />
+                    <div className="flex justify-between items-center">
+                        <div className="space-y-1">
+                        <p className="text-sm font-medium">Total</p>
+                        <p className="text-2xl font-bold text-primary">${formatPrice(0)}</p>
+                        <p className="text-sm text-muted-foreground">{0} unidades</p>
+                        </div>
+                        <Button size="lg" disabled={true} >
+                        Agregar orden
+                        </Button>
+                    </div>
+                    </div>
                 </div>
             </div>
 
