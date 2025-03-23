@@ -65,7 +65,7 @@ export default function Home() {
       url: firstTire?.url || "",
       size: "",
     }
-  }).filter((tire, index) => index < 12); // TODO: Remove this limit
+  })
 
   // Get unique tire types for tabs
   const tireTypes = Array.from(new Set(tireData.map((tire) => tire.type)))
@@ -73,12 +73,11 @@ export default function Home() {
 
   return (
     <div>
-      <nav className='flex items-center justify-between shadow-sm p-3 bg-white text-zinc-700'>
-        <div className='sm:flex sm:items-center '>
-          <Image priority={true} src={logoFormula} alt="logo" className='w-36'/>
-          <h1 className='text-2xl font-semibold'><span className='sm:inline hidden'>|</span> Catálogo de neumáticos</h1>
+      <nav className='flex items-center justify-between shadow-sm p-3 bg-white'>
+        <div className='flex items-center'>
+          <Image priority={true} src={logoFormula} alt="logo" className='w-24'/>
+          <h1 className='text-xl sm:text-2xl font-semibold'><span className='inline'>|</span> Catálogo de neumáticos</h1>
         </div>
-        <Button>Agregar orden</Button>
       </nav>
       <main className='p-5'>
 
