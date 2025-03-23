@@ -26,19 +26,34 @@ const typeLabel: { [key: string]: string } = {
 }
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [tireData, setTireData] = useState<Tire[]>([]);
+  const [filteredTireData, setFilteredTireData] = useState<Tire[]>([]);
   const [uniqueTiresTypes, setUniqueTiresTypes] = useState<string[]>([]);
 
   useEffect(() => {
     import('../public/tire_sample').then((module) => {
       const data = module.default.filter((tire: any) => tire.size !== undefined) as Tire[];
       setTireData(data);
+      setFilteredTireData(data);
       setUniqueTiresTypes([...new Set(data.map((tire: Tire) => tire.type))]);
     });
   }, []);
 
+  useEffect(() => {
+    if (searchQuery === '') {
+      setFilteredTireData(tireData);
+    } else {
+      setFilteredTireData(tireData.filter((tire) => {
+        return tire.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          tire.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          tire.size.toLowerCase().includes(searchQuery.toLowerCase());
+      }));
+    }
+  }, [searchQuery, tireData]);
+
   // Group tires by model to avoid duplicates in the display
-  const uniqueModels = Array.from(new Set(tireData.map((tire) => tire.model_id))).map((modelId) => {
+  const uniqueModels = Array.from(new Set(filteredTireData.map((tire) => tire.model_id))).map((modelId) => {
     const firstTire = tireData.find((tire) => tire.model_id === modelId)
     return {
       model_id: modelId,
@@ -75,8 +90,8 @@ export default function Home() {
             type="search"
             placeholder="Buscar por modelo, marca o medida..."
             className="pl-10"
-            // value={searchQuery}
-            // onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
@@ -92,7 +107,7 @@ export default function Home() {
           <TabsContent value="all">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {uniqueModels.map((tire) => (
-                <TireCard key={tire.model_id} {...tire} tireData={tireData} />
+                <TireCard key={tire.model_id} {...tire} tireData={filteredTireData} />
               ))}
             </div>
           </TabsContent>
@@ -100,7 +115,7 @@ export default function Home() {
             <TabsContent key={type} value={type} className="mt-0">
               <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
                  {uniqueModels.filter((tire) => tire.type === type).map((tire) => (
-                  <TireCard key={tire.model_id} {...tire} tireData={tireData} />
+                  <TireCard key={tire.model_id} {...tire} tireData={filteredTireData} />
                 ))}
               </div>
             </TabsContent>
