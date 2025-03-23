@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 import Image from "next/image"
 import { Maximize2, ExternalLink, Plus, Minus } from "lucide-react"
 import Link from "next/link"
@@ -36,6 +38,11 @@ export default function TireCard({ brand, model_id, model, url, type, size, img,
     // Find all sizes for this model
     const sizes = tireData.filter((t) => t.model_id === model_id).map((t) => t.size)
     const tires = tireData.filter((t) => t.model_id === model_id)
+
+  // State for quantity selection in the modal
+  const [quantities, setQuantities] = useState(
+    Object.fromEntries(sizes.map(size => [size, 0]))
+  )
 
     return (
       <Card className="overflow-hidden">
@@ -94,7 +101,7 @@ export default function TireCard({ brand, model_id, model, url, type, size, img,
             <DialogTrigger asChild>
                 <Button>Tamaños y precios</Button>
             </DialogTrigger>
-            {dialogContent(img, model, tires, url)}
+            {dialogContent(img, model, tires, url, quantities, setQuantities)}
         </Dialog>
         </CardFooter>
       </Card>
@@ -105,7 +112,24 @@ export default function TireCard({ brand, model_id, model, url, type, size, img,
     return `DOP ${price.toLocaleString("en-US", { minimumFractionDigits: 1 })}`;
   }
 
-  const dialogContent = (img: string, model: string, tires: Tire[], url: string) => {
+  const dialogContent = (
+    img: string,
+    model: string,
+    tires: Tire[],
+    url: string,
+    quantities: { [key: string]: number },
+    setQuantities: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>
+  ) => {
+    const handleQuantityChange = (size: string, increment: boolean) => {
+      setQuantities((prevQuantities) => ({
+        ...prevQuantities,
+        [size]: increment ? prevQuantities[size] + 1 : Math.max(prevQuantities[size] - 1, 0),
+      }));
+    };
+
+    const totalQuantity = Object.values(quantities).reduce((acc, quantity) => acc + quantity, 0);
+    const totalPrice = tires.reduce((acc, tire) => acc + (quantities[tire.size] * tire.price), 0);
+
     return (
         <DialogContent className="!max-w-4xl max-h-[90vh] flex flex-col">
             <DialogTitle className="text-xl font-bold">{model}</DialogTitle>
@@ -137,14 +161,16 @@ export default function TireCard({ brand, model_id, model, url, type, size, img,
                                             variant="outline"
                                             size="icon"
                                             className="h-7 w-7"
+                                            onClick={() => handleQuantityChange(tire.size, false)}
                                             >
                                             <Minus className="h-3 w-3" />
                                             </Button>
-                                            <span className="w-8 text-center">0</span>
+                                            <span className="w-8 text-center">{quantities[tire.size]}</span>
                                             <Button
                                             variant="outline"
                                             size="icon"
                                             className="h-7 w-7"
+                                            onClick={() => handleQuantityChange(tire.size, true)}
                                             >
                                             <Plus className="h-3 w-3" />
                                             </Button>
@@ -161,10 +187,10 @@ export default function TireCard({ brand, model_id, model, url, type, size, img,
                     <div className="flex justify-between items-center">
                         <div className="space-y-1">
                         <p className="text-sm font-medium">Total</p>
-                        <p className="text-2xl font-bold text-primary">${formatPrice(0)}</p>
-                        <p className="text-sm text-muted-foreground">{0} unidades</p>
+                        <p className="text-2xl font-bold text-primary">${formatPrice(totalPrice)}</p>
+                        <p className="text-sm text-muted-foreground">{totalQuantity} unidades</p>
                         </div>
-                        <Button size="lg" disabled={true} >
+                        <Button size="lg" disabled={totalQuantity === 0} >
                         Agregar orden
                         </Button>
                     </div>
