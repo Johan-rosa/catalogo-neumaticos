@@ -81,7 +81,7 @@ export default function Home() {
         </div>
 
         <Tabs defaultValue="all" className=" w-full">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8">
+          <TabsList className="grid-cols-4 mb-8">
             <TabsTrigger value="all">Todas</TabsTrigger>
             {tireTypes.map((type) => (
               <TabsTrigger key={type} value={type}>
@@ -92,7 +92,7 @@ export default function Home() {
           <TabsContent value="all">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {uniqueModels.map((tire) => (
-                <TireCard key={tire.model_id} {...tire} />
+                <TireCard key={tire.model_id} {...tire} tireData={tireData} />
               ))}
             </div>
           </TabsContent>
@@ -100,7 +100,7 @@ export default function Home() {
             <TabsContent key={type} value={type} className="mt-0">
               <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
                  {uniqueModels.filter((tire) => tire.type === type).map((tire) => (
-                  <TireCard key={tire.model_id} {...tire} />
+                  <TireCard key={tire.model_id} {...tire} tireData={tireData} />
                 ))}
               </div>
             </TabsContent>

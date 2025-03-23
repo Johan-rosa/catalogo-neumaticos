@@ -1,28 +1,46 @@
 import Image from "next/image"
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog"
-import { Card, CardContent, CardFooter } from "../ui/card"
-import { Badge } from "../ui/badge"
-import { Button } from "../ui/button"
-import { Maximize2 } from "lucide-react"
+import { Maximize2, ExternalLink, Plus, Minus } from "lucide-react"
 import Link from "next/link"
 
+import { Card, CardContent, CardFooter } from "../ui/card"
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "../ui/dialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
+import { Separator } from "../ui/separator";
+import { Badge } from "../ui/badge"
+import { Button } from "../ui/button"
+
 interface Tire {
-    brand: string
-    model_id: string
-    model: string
-    url: string
-    type: string
-    size: string
-    img: string
-    price: number
+    brand: string;
+    model_id: string;
+    model: string;
+    url: string;
+    type: string;
+    size: string;
+    img: string;
+    price: number;
 }
 
-export default function TireCard(tire: Tire) {
-    console.log("Tire img:", tire.img)
+interface TireCardProps {
+    brand: string;
+    model_id: string;
+    model: string;
+    url: string;
+    type: string;
+    size: string;
+    img: string;
+    price: number;
+    tireData: Tire[];
+}
+
+export default function TireCard({ brand, model_id, model, url, type, size, img, price, tireData }: TireCardProps) {
+    // Find all sizes for this model
+    const sizes = tireData.filter((t) => t.model_id === model_id).map((t) => t.size)
+    const tires = tireData.filter((t) => t.model_id === model_id)
+
     return (
       <Card className="overflow-hidden">
         <div className="relative h-48 bg-muted">
-          <Image src={tire.img || "/placeholder.svg"} alt={tire.model} fill className="object-contain p-4" />
+          <Image src={img || "/placeholder.svg"} alt={model} fill className="object-contain p-4" />
           <Dialog>
             <DialogTrigger asChild>
               <Button
@@ -36,7 +54,7 @@ export default function TireCard(tire: Tire) {
             </DialogTrigger>
             <DialogContent className="max-w-4xl h-[80vh] flex items-center justify-center p-0">
               <div className="relative w-full h-full">
-                <Image alt="tire photo" placeholder="blur" src={tire.img} fill className="object-contain p-4" />
+                <Image alt="tire photo" src={img} fill className="object-contain p-4" />
               </div>
             </DialogContent>
           </Dialog>
@@ -44,20 +62,101 @@ export default function TireCard(tire: Tire) {
         <CardContent className="p-4">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h3 className="font-semibold text-lg">{tire.model}</h3>
+              <h3 className="font-semibold text-lg">{model}</h3>
               <div className="mt-1">
-                <p className="text-sm text-zinc-500">{tire.brand}</p>
+                <p className="text-sm text-zinc-500">{brand}</p>
               </div>
             </div>
-            <Badge variant="outline">{tire.type}</Badge>
+            <Badge variant="outline">{type}</Badge>
           </div>
 
+          <div className="flex flex-col">
+            <span className="font-mediumtext-muted-foreground">{sizes.length} {sizes.length > 1 ? "tamaños disponibles": "tamaño disponible"}</span>
+            <div className="mt-2 flex flex-wrap gap-1">
+              {sizes.slice(0, 3).map((size, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  {size}
+                </Badge>
+              ))}
+              {sizes.length > 3 && (
+                <Badge variant="secondary" className="text-xs">
+                  +{sizes.length - 3} más
+                </Badge>
+              )}
+            </div>
+          </div>
         </CardContent>
-        <CardFooter className="p-4 pt-0">
-          <Link href={tire.url} target="_blank" className="w-full">
-            <Button className="w-full">Ver detalles</Button>
-          </Link>
+        <CardFooter className="p-4 pt-0 flex items-center justify-between">
+        <Link href={url} target="_blank" className="text-xs text-primary hover:underline flex items-center">
+          Ver detalles <ExternalLink className="ml-1 h-3 w-3" />
+        </Link>
+        <Dialog>
+            <DialogTrigger>
+                <Button>Tamaños y precios</Button>
+            </DialogTrigger>
+            {dialogContent(img, model, tires)}
+        </Dialog>
         </CardFooter>
       </Card>
+    )
+  }
+
+  function formatPrice(price: number): string {
+    return `DOP ${price.toLocaleString("en-US", { minimumFractionDigits: 1 })}`;
+  }
+
+  const dialogContent = (img: string, model: string, tires: Tire[]) => {
+    return (
+        <DialogContent className="max-w-6xl max-h-[90vh] flex flex-col">
+            <DialogTitle className="text-xl font-bold">{model}</DialogTitle>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                {/* Tire Image */}
+                <div className="relative h-[300px] bg-muted rounded-md">
+                    <Image src={img || "/placeholder.svg"} alt={model} fill className="object-contain p-4" />
+                </div>
+
+                <div>
+                    <h4 className="text-sm font-medium mb-2">Tamaños y Precios</h4>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                            <TableHead>Medida</TableHead>
+                            <TableHead>Precio</TableHead>
+                            <TableHead>Cantidad</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {tires.map(tire => (
+                                <TableRow key={tire.size}>
+                                    <TableCell className="py-1">{tire.size}</TableCell>
+                                    <TableCell className="py-1 font-medium text-primary">${formatPrice(tire.price)}</TableCell>
+                                    <TableCell className="py-1">
+                                        <div className="flex items-center space-x-2">
+                                            <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-7 w-7"
+                                            >
+                                            <Minus className="h-3 w-3" />
+                                            </Button>
+                                            <span className="w-8 text-center">0</span>
+                                            <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-7 w-7"
+                                            >
+                                            <Plus className="h-3 w-3" />
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+
+        </DialogContent>
     )
   }
