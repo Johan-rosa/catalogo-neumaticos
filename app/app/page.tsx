@@ -121,15 +121,25 @@ export default function Home() {
             ))}
           </TabsList>
           <TabsContent value="all">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {
-                uniqueModels
-                  .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                  .map((tire) => (
-                  <TireCard key={tire.model_id} {...tire} tireData={filteredTireData} />
-                  ))
-              }
-            </div>
+            {
+              uniqueModels.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {
+                  uniqueModels
+                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                    .map((tire) => (
+                    <TireCard key={tire.model_id} {...tire} tireData={filteredTireData} />
+                    ))
+                }
+              </div>  
+              ) : (
+                <div className="text-center py-10">
+                  <p className="text-lg text-muted-foreground">
+                    No se encontraron neumáticos que coincidan con tu búsqueda.
+                  </p>
+                </div>
+              )
+            }
             {/* Pagination Controls */}
             <div className="flex justify-center mt-8">
               <Pagination
@@ -142,16 +152,26 @@ export default function Home() {
           </TabsContent>
           {tireTypes.map((type) => (
             <TabsContent key={type} value={type} className="mt-0">
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-                 {
-                  uniqueModels
-                    .filter((tire) => tire.type === type)
-                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                    .map((tire) => (
-                      <TireCard key={tire.model_id} {...tire} tireData={filteredTireData} />
-                    ))  
-                }
-              </div>
+              {
+                uniqueModels.filter((tire) => tire.type === type).length > 0 ? (
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+                  {
+                    uniqueModels
+                      .filter((tire) => tire.type === type)
+                      .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                      .map((tire) => (
+                        <TireCard key={tire.model_id} {...tire} tireData={filteredTireData} />
+                      ))  
+                  }
+                </div>
+                ) : (
+                  <div className="text-center py-10">
+                    <p className="text-lg text-muted-foreground">
+                      No se encontraron neumáticos que coincidan con tu búsqueda.
+                    </p>
+                  </div>
+                )
+              }
 
             {/* Pagination Controls */}
             <div className="flex justify-center mt-8">
