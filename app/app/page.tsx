@@ -81,6 +81,7 @@ export default function Home() {
       price: firstTire?.price || 0,
       url: firstTire?.url || "",
       size: "",
+      offer: Math.random() > 0.7,
     }
   })
 

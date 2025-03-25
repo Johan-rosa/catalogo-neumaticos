@@ -30,9 +30,10 @@ interface TireCardProps {
     img: string;
     price: number;
     tireData: Tire[];
+    offer: boolean;
 }
 
-export default function TireCard({ brand, model_id, model, url, type, size, img, price, tireData }: TireCardProps) {
+export default function TireCard({ brand, model_id, model, url, type, size, img, price, tireData, offer }: TireCardProps) {
     // Find all sizes for this model
     const sizes = tireData.filter((t) => t.model_id === model_id).map((t) => t.size)
     const tires = tireData.filter((t) => t.model_id === model_id)
@@ -48,6 +49,8 @@ export default function TireCard({ brand, model_id, model, url, type, size, img,
     return (
         <Card className="overflow-hidden">
             <div className="relative h-48 bg-muted">
+                    <Image src={img || "/placeholder.svg"} alt={model} fill className="object-contain p-4" />
+                    {offer && <Badge className="absolute top-2 left-2 bg-red-500">Oferta</Badge>}
                 <Image src={img || "/placeholder.svg"} alt={model} fill className="object-contain p-4" />
                 <Dialog >
                     <DialogTrigger asChild>
